@@ -1,0 +1,5 @@
+/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles/OrderBookLib.dir
+/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles/OrderbookTest.dir
+/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles/test.dir
+/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles/edit_cache.dir
+/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles/rebuild_cache.dir
