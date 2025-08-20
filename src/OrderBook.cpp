@@ -128,6 +128,8 @@ TradeInfos OrderBook::add_order_internal(OrderPointer order) {
 
 void OrderBook::cancel_order(OrderId id) {
   std::scoped_lock ordersLock{ordersMutex_};
+  if (orders_.find(id) == orders_.end())
+    return;
   cancel_order_internal(id);
 }
 
@@ -276,62 +278,87 @@ TradeInfos OrderBook::match_orders() {
 TradeInfos trades_made{};
 uint64_t lat = 0;
 while (true) {
-  // if (!can_match())
-  //   break;
     if (bids_.size() == 0 || asks_.size() == 0) {
         break;
       }
       
+      uint64_t t0 = get_time_nanoseconds();
       auto &bids_pair = *bids_.begin();
       auto &asks_pair = *asks_.begin();
       auto &bids_list = bids_pair.second;
       auto &asks_list = asks_pair.second;
       auto bid_it = bids_list.begin();
       auto ask_it = asks_list.begin();
+      uint64_t t1 = get_time_nanoseconds();
+      lat_read_heads.push_back(t1 - t0);
   
       auto &bid_order = **bid_it;
       auto &ask_order = **ask_it;
       
-      
       if(bids_pair.first < asks_pair.first)
       break;
     
+      uint64_t t2 = get_time_nanoseconds();
+      Quantity trade_quantity =
+      std::min(bid_order.get_quantity(), ask_order.get_quantity());
+      uint64_t t3 = get_time_nanoseconds();
+      lat_compute_qty.push_back(t3 - t2);
+      
+      uint64_t t4 = get_time_nanoseconds();
+      Price trade_price = ask_order.get_price();
+      if (ask_order.get_order_type() == OrderType::Market)
+      trade_price = bid_order.get_price();
     
-    Quantity trade_quantity =
-    std::min(bid_order.get_quantity(), ask_order.get_quantity());
-    
-    Price trade_price = ask_order.get_price();
-    if (ask_order.get_order_type() == OrderType::Market)
-    trade_price = bid_order.get_price();
-  
-  auto buy_order_id = bid_order.get_order_id();
-  auto sell_order_id = ask_order.get_order_id();
-  
-  trades_made.emplace_back(
-    TradeInfo::SideInfoTrade{buy_order_id, bid_order.get_price()},
-    TradeInfo::SideInfoTrade{sell_order_id, ask_order.get_price()},
-    trade_price, trade_quantity);
-    
-    bid_order.fill_order(trade_quantity);
-    // uint64_t start_t = get_time_nanoseconds();
-    OnOrderMatched(bids_pair.first, trade_quantity, OrderSide::Buy);
-    
-    if (bid_order.is_filled()) {
-      cancel_order_internal(buy_order_id, true);
-    }
-    // uint64_t end_t = get_time_nanoseconds();
-    // lat += end_t - start_t;
-    
-    
-    ask_order.fill_order(trade_quantity);
-    OnOrderMatched(asks_pair.first, trade_quantity, OrderSide::Sell);
-    
-    if (ask_order.is_filled()) {
-      cancel_order_internal(sell_order_id, true);
-    }
+      auto buy_order_id = bid_order.get_order_id();
+      auto sell_order_id = ask_order.get_order_id();
+      trades_made.emplace_back(
+        TradeInfo::SideInfoTrade{buy_order_id, bid_order.get_price()},
+        TradeInfo::SideInfoTrade{sell_order_id, ask_order.get_price()},
+        trade_price, trade_quantity);
+      uint64_t t5 = get_time_nanoseconds();
+      lat_build_trade.push_back(t5 - t4);
+      
+      uint64_t t6 = get_time_nanoseconds();
+      bid_order.fill_order(trade_quantity);
+      uint64_t t7 = get_time_nanoseconds();
+      lat_fill_buy.push_back(t7 - t6);
+
+      uint64_t t8 = get_time_nanoseconds();
+      OnOrderMatched(bids_pair.first, trade_quantity, OrderSide::Buy);
+      uint64_t t9 = get_time_nanoseconds();
+      lat_onmatch_buy.push_back(t9 - t8);
+      
+      uint64_t t10 = get_time_nanoseconds();
+      if (bid_order.is_filled()) {
+        cancel_order_internal(buy_order_id, true);
+      }
+      uint64_t t11 = get_time_nanoseconds();
+      lat_cancel_buy.push_back(t11 - t10);
+      
+      uint64_t t12 = get_time_nanoseconds();
+      ask_order.fill_order(trade_quantity);
+      uint64_t t13 = get_time_nanoseconds();
+      lat_fill_sell.push_back(t13 - t12);
+
+      uint64_t t14 = get_time_nanoseconds();
+      OnOrderMatched(asks_pair.first, trade_quantity, OrderSide::Sell);
+      uint64_t t15 = get_time_nanoseconds();
+      
+      lat_onmatch_sell.push_back(t15 - t14);
+      if (ask_order.is_filled()) {
+        // cancel_order_internal(sell_order_id, true);
+        asks_list.erase(ask_it);
+        if (asks_list.empty()) {
+          asks_.erase(asks_pair.first);
+        }
+        uint64_t t16 = get_time_nanoseconds();
+        orders_.erase(sell_order_id);
+        uint64_t t17 = get_time_nanoseconds();
+        lat_cancel_sell.push_back(t17 - t16);
+      }
 
   }
-      push_back_latencies.push_back(lat);
+      // push_back_latencies.push_back(lat);
       // check the head of both both and sell sides to see if they have to be
       // killed(fillandkill)
       if (bids_.size() > 0) {
@@ -364,8 +391,7 @@ OrderBook::~OrderBook() {
 }
 
 void OrderBook::cancel_order_internal(OrderId id, bool no_update_level) {
-  if (orders_.find(id) == orders_.end())
-    return;
+
 
   auto &orderinfo = orders_[id];
   OrderPointers::iterator it = orderinfo.it_;

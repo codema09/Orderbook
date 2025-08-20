@@ -2,65 +2,227 @@ Order Book Initialized, has 0 orders currently
 
 Stats for initial BUY population:
 samples: 1000000
-average:  228.858
-median:  200
-95th:    351
+average:  232.092
+median:  201
+95th:    350
 96th:    391
 97th:    430
-98th:    470
-99th:    531
-99.99th: 8236
+98th:    471
+99th:    541
+99.99th: 8506
 
 
 Stats for initial SELL population:
 samples: 1000000
-average:  261.243
-median:  230
-95th:    440
-96th:    471
-97th:    511
-98th:    551
-99th:    621
-99.99th: 7915
+average:  215.023
+median:  191
+95th:    310
+96th:    361
+97th:    411
+98th:    441
+99th:    521
+99.99th: 4628
 
 Stats for 50000 Limit Orders:
 samples: 50000
-average:  776
-median:  641
-95th:    1583
-96th:    1653
-97th:    1734
-98th:    1864
-99th:    2134
-99.99th: 7283
-Push back latencies: 
-samples: 22835
-average:  0
-median:  0
-95th:    0
-96th:    0
-97th:    0
-98th:    0
-99th:    0
-99.99th: 0
+average:  1170.52
+median:  621
+95th:    3016
+96th:    3166
+97th:    3307
+98th:    3517
+99th:    3907
+99.99th: 18435
+Step-wise latencies:
+read_heads:
+samples: 82527
+average:  21.8174
+median:  20
+95th:    30
+96th:    30
+97th:    30
+98th:    30
+99th:    30
+99.99th: 90
+compute_qty:
+samples: 59596
+average:  26.138
+median:  20
+95th:    50
+96th:    90
+97th:    100
+98th:    101
+99th:    111
+99.99th: 431
+build_trade:
+samples: 59596
+average:  35.4587
+median:  30
+95th:    41
+96th:    50
+97th:    70
+98th:    90
+99th:    100
+99.99th: 3487
+fill_buy:
+samples: 59596
+average:  21.8653
+median:  20
+95th:    30
+96th:    30
+97th:    30
+98th:    30
+99th:    30
+99.99th: 40
+onmatch_buy:
+samples: 59596
+average:  84.269
+median:  70
+95th:    170
+96th:    171
+97th:    180
+98th:    181
+99th:    191
+99.99th: 4108
+cancel_buy:
+samples: 59596
+average:  69.7794
+median:  31
+95th:    181
+96th:    191
+97th:    200
+98th:    211
+99th:    251
+99.99th: 932
+fill_sell:
+samples: 59596
+average:  21.8844
+median:  20
+95th:    30
+96th:    30
+97th:    30
+98th:    30
+99th:    31
+99.99th: 40
+onmatch_sell:
+samples: 59596
+average:  77.2582
+median:  60
+95th:    161
+96th:    170
+97th:    170
+98th:    180
+99th:    190
+99.99th: 391
+cancel_sell:
+samples: 29951
+average:  84.0653
+median:  100
+95th:    170
+96th:    181
+97th:    191
+98th:    210
+99th:    331
+99.99th: 4248
 
 Stats for 50000 Market Orders:
 samples: 50000
-average:  904.645
-median:  811
-95th:    1714
-96th:    1823
-97th:    1964
-98th:    2164
-99th:    2545
-99.99th: 10560
-Push back latencies: 
-samples: 50000
-average:  0
-median:  0
-95th:    0
-96th:    0
-97th:    0
-98th:    0
-99th:    0
-99.99th: 0
+average:  1900.86
+median:  1754
+95th:    3186
+96th:    3317
+97th:    3486
+98th:    3687
+99th:    4228
+99.99th: 22192
+Step-wise latencies:
+read_heads:
+samples: 189321
+average:  22.1888
+median:  20
+95th:    30
+96th:    30
+97th:    30
+98th:    30
+99th:    31
+99.99th: 300
+compute_qty:
+samples: 139321
+average:  26.6895
+median:  20
+95th:    80
+96th:    90
+97th:    91
+98th:    100
+99th:    110
+99.99th: 601
+build_trade:
+samples: 139321
+average:  27.4679
+median:  30
+95th:    31
+96th:    40
+97th:    40
+98th:    40
+99th:    40
+99.99th: 141
+fill_buy:
+samples: 139321
+average:  21.9696
+median:  20
+95th:    30
+96th:    30
+97th:    30
+98th:    30
+99th:    31
+99.99th: 40
+onmatch_buy:
+samples: 139321
+average:  46.5948
+median:  40
+95th:    60
+96th:    61
+97th:    71
+98th:    90
+99th:    120
+99.99th: 692
+cancel_buy:
+samples: 139321
+average:  72.7136
+median:  50
+95th:    190
+96th:    201
+97th:    221
+98th:    260
+99th:    341
+99.99th: 1203
+fill_sell:
+samples: 139321
+average:  21.9171
+median:  20
+95th:    30
+96th:    30
+97th:    30
+98th:    30
+99th:    31
+99.99th: 40
+onmatch_sell:
+samples: 139321
+average:  42.6624
+median:  40
+95th:    51
+96th:    60
+97th:    70
+98th:    81
+99th:    120
+99.99th: 862
+cancel_sell:
+samples: 69466
+average:  101.315
+median:  120
+95th:    200
+96th:    210
+97th:    220
+98th:    250
+99th:    401
+99.99th: 1654

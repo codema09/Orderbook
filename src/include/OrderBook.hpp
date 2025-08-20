@@ -36,6 +36,16 @@ public:
   
   ~OrderBook();
   std::vector<uint64_t> push_back_latencies;
+  // Step-wise latencies
+  std::vector<uint64_t> lat_read_heads;
+  std::vector<uint64_t> lat_compute_qty;
+  std::vector<uint64_t> lat_build_trade;
+  std::vector<uint64_t> lat_fill_buy;
+  std::vector<uint64_t> lat_onmatch_buy;
+  std::vector<uint64_t> lat_cancel_buy;
+  std::vector<uint64_t> lat_fill_sell;
+  std::vector<uint64_t> lat_onmatch_sell;
+  std::vector<uint64_t> lat_cancel_sell;
 private:
   struct OrderInfoByID {
     OrderPointer pointer_; // points to the actual Order object
