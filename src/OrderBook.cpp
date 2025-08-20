@@ -78,11 +78,10 @@ TradeInfos OrderBook::add_order_internal(OrderPointer order) {
   auto side = order->get_order_side();
   auto price = order->get_price();
 
-  if (orders_.contains(id)) [[likely]] {
+  if (orders_.contains(id)) [[unlikely]] {
     return {};
   }
 
-  return {};
   
   if ( (order->get_order_type() == OrderType::FillAndKill &&
       !can_match_order(side, price)))
