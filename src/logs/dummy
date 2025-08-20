@@ -1,57 +1,66 @@
-Memory Pool Initialized with 65536 slots
 Order Book Initialized, has 0 orders currently
-
-Stats for initial SELL population:
-samples: 1000000
-average:  285.69
-median:  160
-95th:    210
-96th:    241
-97th:    1523
-98th:    1573
-99th:    1693
-99.99th: 6743
 
 Stats for initial BUY population:
 samples: 1000000
-average:  285.585
-median:  150
-95th:    201
-96th:    231
-97th:    1512
-98th:    1573
-99th:    1653
-99.99th: 6212
+average:  228.858
+median:  200
+95th:    351
+96th:    391
+97th:    430
+98th:    470
+99th:    531
+99.99th: 8236
 
-Push back latencies: 
-samples: 2000000
-average:  162.494
-median:  60
-95th:    100
-96th:    120
-97th:    170
-98th:    210
-99th:    1382
-99.99th: 4919
+
+Stats for initial SELL population:
+samples: 1000000
+average:  261.243
+median:  230
+95th:    440
+96th:    471
+97th:    511
+98th:    551
+99th:    621
+99.99th: 7915
 
 Stats for 50000 Limit Orders:
 samples: 50000
-average:  607.407
-median:  571
-95th:    1082
-96th:    1142
-97th:    1212
-98th:    1332
-99th:    1563
-99.99th: 7695
+average:  776
+median:  641
+95th:    1583
+96th:    1653
+97th:    1734
+98th:    1864
+99th:    2134
+99.99th: 7283
+Push back latencies: 
+samples: 22835
+average:  0
+median:  0
+95th:    0
+96th:    0
+97th:    0
+98th:    0
+99th:    0
+99.99th: 0
 
 Stats for 50000 Market Orders:
 samples: 50000
-average:  688.067
-median:  511
-95th:    1032
-96th:    1122
-97th:    1253
-98th:    1423
-99th:    1693
-99.99th: 6703
+average:  904.645
+median:  811
+95th:    1714
+96th:    1823
+97th:    1964
+98th:    2164
+99th:    2545
+99.99th: 10560
+Push back latencies: 
+samples: 50000
+average:  0
+median:  0
+95th:    0
+96th:    0
+97th:    0
+98th:    0
+99th:    0
+99.99th: 0

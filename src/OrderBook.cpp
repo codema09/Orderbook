@@ -18,10 +18,12 @@ static inline uint64_t get_time_nanoseconds() {
 }
 
 OrderBook::OrderBook()
-    : ordersPruneThread_{[this]() { PruneGoodForDayOrders(); }}, pool(std::make_shared<MemoryPool<ListNode<OrderPointer>>>(100000)) {
+    : ordersPruneThread_{[this]() { PruneGoodForDayOrders(); }}, pool(std::make_shared<MemoryPool<ListNode<OrderPointer>>>(3000000)) {
   std::cout << "Order Book Initialized, has 0 orders currently" << std::endl;
+  // Pre-size for ~3,000,000 orders to avoid rehash spikes
+  orders_.max_load_factor(0.7f);
+  orders_.reserve(3000000);
 }
-
 void OrderBook::PruneGoodForDayOrders() {//have to test.
 
   using namespace std::chrono;
@@ -101,7 +103,6 @@ TradeInfos OrderBook::add_order_internal(OrderPointer order) {
     order->market_normalize();
   }
   price = order->get_price();
-  uint64_t start_t = get_time_nanoseconds();
   OrderPointers::iterator it;
   if (side == OrderSide::Buy) {
     auto it_level = bids_.find(price);
@@ -118,11 +119,11 @@ TradeInfos OrderBook::add_order_internal(OrderPointer order) {
     auto &asks_list = it_level->second;
     it = asks_list.emplace_back(order);
   }
-  orders_[id] = OrderInfoByID{order, it};
-  uint64_t end_t = get_time_nanoseconds();
-  push_back_latencies.push_back(end_t - start_t);
+  orders_.try_emplace(id, OrderInfoByID{order, it});
   OnOrderAdded(order);
-  return match_orders();
+
+  const auto & trades_made=match_orders();
+  return trades_made;
 }
 
 void OrderBook::cancel_order(OrderId id) {
@@ -269,53 +270,74 @@ bool OrderBook::can_fully_match_order(OrderSide side, Price price,
 }
 
 TradeInfos OrderBook::match_orders() {
-  
   if (!can_match())
   return TradeInfos{};
 
-  TradeInfos trades_made{};
-  while (true) {
-    if (!can_match())
+TradeInfos trades_made{};
+uint64_t lat = 0;
+while (true) {
+  // if (!can_match())
+  //   break;
+    if (bids_.size() == 0 || asks_.size() == 0) {
+        break;
+      }
+      
+      auto &bids_pair = *bids_.begin();
+      auto &asks_pair = *asks_.begin();
+      auto &bids_list = bids_pair.second;
+      auto &asks_list = asks_pair.second;
+      auto bid_it = bids_list.begin();
+      auto ask_it = asks_list.begin();
+  
+      auto &bid_order = **bid_it;
+      auto &ask_order = **ask_it;
+      
+      
+      if(bids_pair.first < asks_pair.first)
       break;
-    auto &[buy_price, bids_list] = *bids_.begin();
-    auto &[sell_price, asks_list] = *asks_.begin();
-
-    auto &bids_entry = *bids_list.begin();
-    auto &asks_entry = *asks_list.begin();
+    
+    
     Quantity trade_quantity =
-        std::min(bids_entry->get_quantity(), asks_entry->get_quantity());
-
-    Price trade_price = asks_entry->get_price();
-    if(asks_entry->get_order_type() == OrderType::Market) trade_price = bids_entry->get_price();// exception.
-    auto buy_order_id = bids_entry->get_order_id();
-    auto sell_order_id = asks_entry->get_order_id();
-
-    trades_made.emplace_back(
-        TradeInfo::SideInfoTrade{buy_order_id, bids_entry->get_price()},
-        TradeInfo::SideInfoTrade{sell_order_id, asks_entry->get_price()},
-        trade_price, trade_quantity);
-
-    bids_entry->fill_order(trade_quantity);
-    OnOrderMatched(buy_price, trade_quantity, OrderSide::Buy);
-
-    if (bids_entry->is_filled()) {
-      cancel_order_internal(buy_order_id);
+    std::min(bid_order.get_quantity(), ask_order.get_quantity());
+    
+    Price trade_price = ask_order.get_price();
+    if (ask_order.get_order_type() == OrderType::Market)
+    trade_price = bid_order.get_price();
+  
+  auto buy_order_id = bid_order.get_order_id();
+  auto sell_order_id = ask_order.get_order_id();
+  
+  trades_made.emplace_back(
+    TradeInfo::SideInfoTrade{buy_order_id, bid_order.get_price()},
+    TradeInfo::SideInfoTrade{sell_order_id, ask_order.get_price()},
+    trade_price, trade_quantity);
+    
+    bid_order.fill_order(trade_quantity);
+    // uint64_t start_t = get_time_nanoseconds();
+    OnOrderMatched(bids_pair.first, trade_quantity, OrderSide::Buy);
+    
+    if (bid_order.is_filled()) {
+      cancel_order_internal(buy_order_id, true);
     }
-
-    asks_entry->fill_order(trade_quantity);
-    OnOrderMatched(sell_price, trade_quantity, OrderSide::Sell);
-
-    if (asks_entry->is_filled()) {
-      cancel_order_internal(sell_order_id);
+    // uint64_t end_t = get_time_nanoseconds();
+    // lat += end_t - start_t;
+    
+    
+    ask_order.fill_order(trade_quantity);
+    OnOrderMatched(asks_pair.first, trade_quantity, OrderSide::Sell);
+    
+    if (ask_order.is_filled()) {
+      cancel_order_internal(sell_order_id, true);
     }
 
   }
-  // check the head of both both and sell sides to see if they have to be
-  // killed(fillandkill)
-  if (bids_.size() > 0) {
-    auto &[buy_price, bids_list] = *bids_.begin();
-    auto &bids_entry = *bids_list.begin();
-    auto buy_order_id = bids_entry->get_order_id();
+      push_back_latencies.push_back(lat);
+      // check the head of both both and sell sides to see if they have to be
+      // killed(fillandkill)
+      if (bids_.size() > 0) {
+        auto &[buy_price, bids_list] = *bids_.begin();
+        auto &bids_entry = *bids_list.begin();
+        auto buy_order_id = bids_entry->get_order_id();
 
     if (bids_entry->get_order_type() == OrderType::FillAndKill) {
       cancel_order_internal(buy_order_id);
@@ -341,7 +363,7 @@ OrderBook::~OrderBook() {
   ordersPruneThread_.join();
 }
 
-void OrderBook::cancel_order_internal(OrderId id) {
+void OrderBook::cancel_order_internal(OrderId id, bool no_update_level) {
   if (orders_.find(id) == orders_.end())
     return;
 
@@ -364,7 +386,7 @@ void OrderBook::cancel_order_internal(OrderId id) {
       asks_.erase(price);
     }
   }
-  OnOrderCancelled(order);
+  if(!no_update_level)OnOrderCancelled(order);
   orders_.erase(id);
 }
 

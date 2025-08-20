@@ -3,11 +3,12 @@
 #include "OrderType.hpp"
 #include "OrderSide.hpp"
 #include "Order.hpp"
+#include "PooledShared.hpp"
 
 class OrderModify{
     public:
-        OrderModify(OrderType type, OrderSide side, OrderId id, Price price, Quantity quantity):
-        type_(type),side_(side),id_(id), price_(price), quantity_order_(quantity)
+        OrderModify(MemoryPool<Order>* pool_ptr, OrderType type, OrderSide side, OrderId id, Price price, Quantity quantity):
+        pool_ptr_(pool_ptr),type_(type),side_(side),id_(id), price_(price), quantity_order_(quantity)
         {}
 
 
@@ -28,10 +29,11 @@ class OrderModify{
          }
 
         OrderPointer to_order_ptr() {
-            return std::make_shared<Order>(type_, side_, id_, price_, quantity_order_);
+            return make_intrusive_pooled_order(pool_ptr_, type_, side_, id_, price_, quantity_order_);
         }
 
     private:
+    MemoryPool<Order>* pool_ptr_;
     OrderType type_;
     OrderSide side_;
     OrderId id_;

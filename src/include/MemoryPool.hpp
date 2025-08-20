@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <cstddef>
 #include <cassert>
@@ -5,7 +6,6 @@
 #include <memory>
 #include <new>
 #include <utility>
-#include <iostream>
 
 // Custom Memory Pool for template types using an intrusive free list
 template<typename T>
@@ -31,8 +31,7 @@ private:
 
     std::vector<std::unique_ptr<Chunk>> chunks_;
     FreeNode* free_head_ = nullptr;     // head of free list (intrusive)
-    static constexpr size_t chunk_bytes = 2* 1024*1024;
-    size_t next_chunk_slots_ ;
+    size_t next_chunk_slots_;
 
     T* acquire_raw_slot() {
         if (free_head_ != nullptr) {
@@ -42,7 +41,9 @@ private:
         }
         T* node = chunks_.back()->allocate_from_chunk();
         if (node == nullptr) {
-            next_chunk_slots_ = next_chunk_slots_ == 0 ? 1 : next_chunk_slots_ ;
+            // grow moderately (1.5x)
+            size_t grown = next_chunk_slots_ + next_chunk_slots_ / 2;
+            next_chunk_slots_ = grown > 0 ? grown : 1;
             chunks_.emplace_back(std::make_unique<Chunk>(next_chunk_slots_));
             node = chunks_.back()->allocate_from_chunk();
         }
@@ -50,10 +51,18 @@ private:
     }
 
 public:
-    explicit MemoryPool(size_t initial_slots = 100000) : next_chunk_slots_(std::max<size_t>(1024, chunk_bytes / sizeof(T))) {
+    explicit MemoryPool(size_t initial_slots = 100000)
+        : next_chunk_slots_(std::max<size_t>(1024, initial_slots)) {
         chunks_.emplace_back(std::make_unique<Chunk>(next_chunk_slots_));
-        next_chunk_slots_ = std::max<size_t>(1024, chunk_bytes / sizeof(T));
-        std::cout<<"Memory Pool Initialized with "<<next_chunk_slots_<<" slots"<<std::endl;
+    }
+
+    // Pre-allocate at least 'slots' total capacity
+    void reserve_slots(size_t slots) {
+        while (total_capacity() < slots) {
+            size_t grown = next_chunk_slots_ + next_chunk_slots_ / 2;
+            next_chunk_slots_ = grown > 0 ? grown : 1;
+            chunks_.emplace_back(std::make_unique<Chunk>(next_chunk_slots_));
+        }
     }
 
     T* allocate() {

@@ -13,6 +13,7 @@
 #include "include/Usings.hpp"
 #include "include/constants.hpp"
 #include "perf_utils/LatencyStats.hpp"
+#include "include/PooledShared.hpp"
 
 using namespace std;
 
@@ -55,42 +56,36 @@ std::mt19937 rng(std::random_device{}()); // Mersenne Twister
 std::uniform_int_distribution<int> qty_dist(100, 1000);
 std::uniform_int_distribution<int> side_dist(0, 1); // 0=buy, 1=sell
 
-auto ob = OrderBook();
-
-double start_sell_price = 125.0;
-OrderId id = 0;
-uint64_t populate_time_init = 0;
-std::vector<uint64_t> init_sell_latencies;
-init_sell_latencies.reserve(10000 * 100);
-for (int level = 0; level < 10000; ++level) {
-    double price = start_sell_price + (level/100.0); // e.g. 125, 125.01, ...
-    for (int j = 0; j < 100; ++j) {
-        id++;
-        int quantity = qty_dist(rng);
-        uint64_t start_t = get_time_nanoseconds();
-        auto trades = ob.add_order(make_shared<Order>(OrderType::GoodTillCancel, OrderSide::Sell, id,price, quantity ));
-        uint64_t end_t = get_time_nanoseconds();
-        populate_time_init += end_t- start_t;
-        init_sell_latencies.push_back(end_t - start_t);
-
-    }
+// Create pooled allocator for Order objects (intrusive) BEFORE OrderBook so it outlives orders
+constexpr size_t expected_orders = 10'000 * 100 * 2 + 100'000; // initial + later
+MemoryPool<Order> order_pool(1'000'000);
+order_pool.reserve_slots(expected_orders);
+// Warm-up: fault pages
+for (int i = 0; i < 1000; ++i) {
+    Order* tmp = order_pool.allocate_emplace(&order_pool, OrderType::GoodTillCancel, OrderSide::Buy, -1, 0.0, 0);
+    order_pool.deallocate(tmp);
 }
 
-cout<<endl<<"Stats for initial SELL population:"<<endl;
-auto init_sell_stats = computeLatencyStats(init_sell_latencies);
-appendLatencyStatsToFile(init_sell_stats);
+auto ob = OrderBook();
 
 double start_buy_price = 123.0;
 
 std::vector<uint64_t> init_buy_latencies;
 init_buy_latencies.reserve(10000 * 100);
+uint64_t populate_time_init = 0;
+std::vector<uint64_t> init_sell_latencies;
+init_sell_latencies.reserve(10000 * 100);
+OrderId id = 0;
+
+
 for (int level = 0; level < 10000; ++level) {
     double price = start_buy_price - (level/100.0); // e.g. 123, 122.99, ...
     for (int j = 0; j < 100; ++j) {
         id++;
         int quantity = qty_dist(rng);
         uint64_t start_t = get_time_nanoseconds();
-        ob.add_order(make_shared<Order>(OrderType::GoodTillCancel, OrderSide::Buy, id,price, quantity ));
+        OrderPointer order = make_intrusive_pooled_order(&order_pool, OrderType::GoodTillCancel, OrderSide::Buy, id,price, quantity );
+        auto trades = ob.add_order(order);
         uint64_t end_t = get_time_nanoseconds();
         populate_time_init += end_t- start_t;
         init_buy_latencies.push_back(end_t - start_t);
@@ -105,13 +100,33 @@ appendLatencyStatsToFile(init_buy_stats);
 
 cout<<endl;
 
-cout<<"Push back latencies: "<<endl;
-auto push_back_stats = computeLatencyStats(ob.push_back_latencies);
-appendLatencyStatsToFile(push_back_stats);
+
+
+double start_sell_price = 125.0;
+for (int level = 0; level < 10000; ++level) {
+    double price = start_sell_price + (level/100.0); // e.g. 125, 125.01, ...
+    for (int j = 0; j < 100; ++j) {
+        id++;
+        int quantity = qty_dist(rng);
+        uint64_t start_t = get_time_nanoseconds();
+        OrderPointer order = make_intrusive_pooled_order(&order_pool, OrderType::GoodTillCancel, OrderSide::Sell, id,price, quantity );
+        auto trades = ob.add_order(order);
+        uint64_t end_t = get_time_nanoseconds();
+        populate_time_init += end_t- start_t;
+        init_sell_latencies.push_back(end_t - start_t);
+
+    }
+}
+
+cout<<endl<<"Stats for initial SELL population:"<<endl;
+auto init_sell_stats = computeLatencyStats(init_sell_latencies);
+appendLatencyStatsToFile(init_sell_stats);
+
 
 
 {
 
+    ob.push_back_latencies.clear();
 const int NUM_LIMIT_ORDERS = 50000;
 uint64_t total_limit_ns = 0;
 std::vector<uint64_t> limit_latencies;
@@ -129,18 +144,13 @@ for (int i = 0; i < NUM_LIMIT_ORDERS; ++i) {
     double price = prices[i]; // Use pre-generated price
 
     uint64_t start_t = get_time_nanoseconds();
-    auto trades = ob.add_order(make_shared<Order>(OrderType::GoodTillCancel, side, id, price, qty));
+    OrderPointer order = make_intrusive_pooled_order(&order_pool, OrderType::GoodTillCancel, side, id, price, qty);
+    auto trades = ob.add_order(order);
     uint64_t end_t = get_time_nanoseconds();
 
     uint64_t duration = end_t - start_t;
     total_limit_ns += duration;
     limit_latencies.push_back(duration);
-    // cout<<"trade "<<i<<": ";
-    // trades.print_stats();
-    // if(side == OrderSide::Sell)cout<<"Sell ";
-    // else cout<<"Buy ";
-    // cout<<price<<" "<<qty<<" "<<endl;;
-    
 }
 double avg_limit_ns = static_cast<double>(total_limit_ns) / NUM_LIMIT_ORDERS;
     cout<<endl<<"Stats for "<<NUM_LIMIT_ORDERS<<" "<<"Limit Orders:"<<endl;
@@ -148,10 +158,15 @@ double avg_limit_ns = static_cast<double>(total_limit_ns) / NUM_LIMIT_ORDERS;
     auto limit_stats = computeLatencyStats(limit_latencies);
     appendLatencyStatsToFile(limit_stats);
 
+    cout<<"Push back latencies: "<<endl;
+    auto push_back_stats = computeLatencyStats(ob.push_back_latencies);
+    appendLatencyStatsToFile(push_back_stats);
+    
+
 }
 
 {
-
+    ob.push_back_latencies.clear();
     const int NUM_MARKET_ORDERS = 50000;
     uint64_t total_mkt_ns = 0;
     std::vector<uint64_t> market_latencies;
@@ -169,17 +184,13 @@ double avg_limit_ns = static_cast<double>(total_limit_ns) / NUM_LIMIT_ORDERS;
         double price = prices[i]; // Use pre-generated price
     
         uint64_t start_t = get_time_nanoseconds();
-        auto trades = ob.add_order(make_shared<Order>(OrderType::Market, side, id, Constants::InvalidPrice, qty));
+        OrderPointer order = make_intrusive_pooled_order(&order_pool, OrderType::Market, side, id, Constants::InvalidPrice, qty);
+        auto trades = ob.add_order(order);
         uint64_t end_t = get_time_nanoseconds();
     
         uint64_t duration = end_t - start_t;
         total_mkt_ns += duration;
         market_latencies.push_back(duration);
-        // cout<<"trade "<<i<<": ";
-        // trades.print_stats();
-        // if(side == OrderSide::Sell)cout<<"Sell ";
-        // else cout<<"Buy ";
-        // cout<<price<<" "<<qty<<" "<<endl;;
         
     }
     double avg_mkt_ns = static_cast<double>(total_mkt_ns) / NUM_MARKET_ORDERS;
@@ -187,6 +198,9 @@ double avg_limit_ns = static_cast<double>(total_limit_ns) / NUM_LIMIT_ORDERS;
         auto market_stats = computeLatencyStats(market_latencies);
         appendLatencyStatsToFile(market_stats);
     }
+    cout<<"Push back latencies: "<<endl;
+    auto push_back_stats = computeLatencyStats(ob.push_back_latencies);
+    appendLatencyStatsToFile(push_back_stats);
     
 
 }
