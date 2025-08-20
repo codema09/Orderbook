@@ -275,7 +275,8 @@ TradeInfos OrderBook::match_orders() {
   if (!can_match())
   return TradeInfos{};
 
-TradeInfos trades_made{};
+TradeInfos trades_made;
+trades_made.trades_made_.reserve(10);
 while (true) {
     if (bids_.size() == 0 || asks_.size() == 0) {
         break;
@@ -311,12 +312,18 @@ while (true) {
       bid_order.fill_order(trade_quantity);
       OnOrderMatched(bids_pair.first, trade_quantity, OrderSide::Buy);
       if (bid_order.is_filled()) {
-        cancel_order_internal(buy_order_id, true);
+        // cancel_order_internal(buy_order_id, true);
+        bids_list.erase(bid_it);
+        if (bids_list.empty()) {
+          bids_.erase(bids_pair.first);
+        }
+        orders_.erase(buy_order_id);
       }
       
       ask_order.fill_order(trade_quantity);
       OnOrderMatched(asks_pair.first, trade_quantity, OrderSide::Sell);
       if (ask_order.is_filled()) {
+        // cancel_order_internal(sell_order_id, true);
         asks_list.erase(ask_it);
         if (asks_list.empty()) {
           asks_.erase(asks_pair.first);
