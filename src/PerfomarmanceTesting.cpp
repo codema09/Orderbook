@@ -126,7 +126,7 @@ appendLatencyStatsToFile(init_sell_stats);
 
 {
 
-    ob.push_back_latencies.clear();
+    // ob.push_back_latencies.clear();
 const int NUM_LIMIT_ORDERS = 50000;
 uint64_t total_limit_ns = 0;
 std::vector<uint64_t> limit_latencies;
@@ -158,33 +158,33 @@ double avg_limit_ns = static_cast<double>(total_limit_ns) / NUM_LIMIT_ORDERS;
     auto limit_stats = computeLatencyStats(limit_latencies);
     appendLatencyStatsToFile(limit_stats);
 
-    cout<<"Step-wise latencies:"<<endl;
-    cout<<"read_heads:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_read_heads));
-    cout<<"compute_qty:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_compute_qty));
-    cout<<"build_trade:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_build_trade));
-    cout<<"fill_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_buy));
-    cout<<"onmatch_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_buy));
-    cout<<"cancel_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_buy));
-    cout<<"fill_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_sell));
-    cout<<"onmatch_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_sell));
-    cout<<"cancel_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_sell));
+    // cout<<"Step-wise latencies:"<<endl;
+    // cout<<"read_heads:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_read_heads));
+    // cout<<"compute_qty:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_compute_qty));
+    // cout<<"build_trade:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_build_trade));
+    // cout<<"fill_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_buy));
+    // cout<<"onmatch_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_buy));
+    // cout<<"cancel_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_buy));
+    // cout<<"fill_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_sell));
+    // cout<<"onmatch_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_sell));
+    // cout<<"cancel_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_sell));
 
     // Clear all vectors
-    ob.lat_read_heads.clear();
-    ob.lat_compute_qty.clear();
-    ob.lat_build_trade.clear();
-    ob.lat_fill_buy.clear();
-    ob.lat_onmatch_buy.clear();
-    ob.lat_cancel_buy.clear();
-    ob.lat_fill_sell.clear();
-    ob.lat_onmatch_sell.clear();
-    ob.lat_cancel_sell.clear();
-    ob.push_back_latencies.clear();
+    // ob.lat_read_heads.clear();
+    // ob.lat_compute_qty.clear();
+    // ob.lat_build_trade.clear();
+    // ob.lat_fill_buy.clear();
+    // ob.lat_onmatch_buy.clear();
+    // ob.lat_cancel_buy.clear();
+    // ob.lat_fill_sell.clear();
+    // ob.lat_onmatch_sell.clear();
+    // ob.lat_cancel_sell.clear();
+    // ob.push_back_latencies.clear();
 
 }
 
 {
-    ob.push_back_latencies.clear();
+    // ob.push_back_latencies.clear();
     const int NUM_MARKET_ORDERS = 50000;
     uint64_t total_mkt_ns = 0;
     std::vector<uint64_t> market_latencies;
@@ -216,28 +216,28 @@ double avg_limit_ns = static_cast<double>(total_limit_ns) / NUM_LIMIT_ORDERS;
         auto market_stats = computeLatencyStats(market_latencies);
         appendLatencyStatsToFile(market_stats);
 
-        cout<<"Step-wise latencies:"<<endl;
-        cout<<"read_heads:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_read_heads));
-        cout<<"compute_qty:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_compute_qty));
-        cout<<"build_trade:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_build_trade));
-        cout<<"fill_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_buy));
-        cout<<"onmatch_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_buy));
-        cout<<"cancel_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_buy));
-        cout<<"fill_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_sell));
-        cout<<"onmatch_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_sell));
-        cout<<"cancel_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_sell));
+        // cout<<"Step-wise latencies:"<<endl;
+        // cout<<"read_heads:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_read_heads));
+        // cout<<"compute_qty:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_compute_qty));
+        // cout<<"build_trade:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_build_trade));
+        // cout<<"fill_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_buy));
+        // cout<<"onmatch_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_buy));
+        // cout<<"cancel_buy:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_buy));
+        // cout<<"fill_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_fill_sell));
+        // cout<<"onmatch_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_onmatch_sell));
+        // cout<<"cancel_sell:"<<endl; appendLatencyStatsToFile(computeLatencyStats(ob.lat_cancel_sell));
 
-        // Clear all vectors
-        ob.lat_read_heads.clear();
-        ob.lat_compute_qty.clear();
-        ob.lat_build_trade.clear();
-        ob.lat_fill_buy.clear();
-        ob.lat_onmatch_buy.clear();
-        ob.lat_cancel_buy.clear();
-        ob.lat_fill_sell.clear();
-        ob.lat_onmatch_sell.clear();
-        ob.lat_cancel_sell.clear();
-        ob.push_back_latencies.clear();
+        // // Clear all vectors
+        // ob.lat_read_heads.clear();
+        // ob.lat_compute_qty.clear();
+        // ob.lat_build_trade.clear();
+        // ob.lat_fill_buy.clear();
+        // ob.lat_onmatch_buy.clear();
+        // ob.lat_cancel_buy.clear();
+        // ob.lat_fill_sell.clear();
+        // ob.lat_onmatch_sell.clear();
+        // ob.lat_cancel_sell.clear();
+        // ob.push_back_latencies.clear();
 }
     
 

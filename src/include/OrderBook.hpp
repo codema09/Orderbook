@@ -16,7 +16,7 @@
 #include <memory>
 #include <boost/unordered/unordered_flat_map.hpp>
 #include "CustomDLL.hpp"
-
+#include "tsl/robin_map.h"
 
 class OrderBook {
 public:
@@ -35,17 +35,6 @@ public:
   OrderPointer get_order_by_id(OrderId );
   
   ~OrderBook();
-  std::vector<uint64_t> push_back_latencies;
-  // Step-wise latencies
-  std::vector<uint64_t> lat_read_heads;
-  std::vector<uint64_t> lat_compute_qty;
-  std::vector<uint64_t> lat_build_trade;
-  std::vector<uint64_t> lat_fill_buy;
-  std::vector<uint64_t> lat_onmatch_buy;
-  std::vector<uint64_t> lat_cancel_buy;
-  std::vector<uint64_t> lat_fill_sell;
-  std::vector<uint64_t> lat_onmatch_sell;
-  std::vector<uint64_t> lat_cancel_sell;
 private:
   struct OrderInfoByID {
     OrderPointer pointer_; // points to the actual Order object
@@ -63,7 +52,7 @@ private:
 
   std::map<Price, OrderPointers, std::greater<Price>> bids_;
   std::map<Price, OrderPointers, std::less<Price>> asks_;
-  boost::unordered_flat_map<OrderId, OrderInfoByID> orders_;
+  tsl::robin_map<OrderId, OrderInfoByID> orders_;
   LevelsInfo levels;
   mutable std::mutex ordersMutex_;
   std::thread ordersPruneThread_;
