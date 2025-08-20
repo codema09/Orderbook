@@ -10,8 +10,15 @@
 #include <condition_variable>
 #include <mutex>
 
+
+static inline uint64_t get_time_nanoseconds() {
+  auto now = std::chrono::high_resolution_clock::now();
+  auto duration = now.time_since_epoch();
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+}
+
 OrderBook::OrderBook()
-    : ordersPruneThread_{[this]() { PruneGoodForDayOrders(); }} {
+    : ordersPruneThread_{[this]() { PruneGoodForDayOrders(); }}, pool(std::make_shared<MemoryPool<ListNode<OrderPointer>>>(100000)) {
   std::cout << "Order Book Initialized, has 0 orders currently" << std::endl;
 }
 
@@ -78,12 +85,11 @@ TradeInfos OrderBook::add_order_internal(OrderPointer order) {
   auto side = order->get_order_side();
   auto price = order->get_price();
 
-  if (orders_.contains(id)) [[unlikely]] {
+  if (orders_.find(id) != orders_.end()) [[unlikely]] {
     return {};
   }
 
-  
-  if ( (order->get_order_type() == OrderType::FillAndKill &&
+  if ((order->get_order_type() == OrderType::FillAndKill &&
       !can_match_order(side, price)))
     return {};
 
@@ -91,22 +97,30 @@ TradeInfos OrderBook::add_order_internal(OrderPointer order) {
       !can_fully_match_order(side, price, order->get_quantity()))
     return {};
 
-
   if (order->get_order_type() == OrderType::Market) {
     order->market_normalize();
   }
   price = order->get_price();
+  uint64_t start_t = get_time_nanoseconds();
   OrderPointers::iterator it;
   if (side == OrderSide::Buy) {
-    auto &bids_list = bids_[price];
-    bids_list.push_back(order);
-    it = std::prev(bids_list.end());
+    auto it_level = bids_.find(price);
+    if (it_level == bids_.end()) {
+      it_level = bids_.emplace(price, OrderPointers(pool)).first;
+    }
+    auto &bids_list = it_level->second;
+    it = bids_list.emplace_back(order);
   } else if (side == OrderSide::Sell) {
-    auto &asks_list = asks_[price];
-    asks_list.push_back(order);
-    it = std::prev(asks_list.end());
+    auto it_level = asks_.find(price);
+    if (it_level == asks_.end()) {
+      it_level = asks_.emplace(price, OrderPointers(pool)).first;
+    }
+    auto &asks_list = it_level->second;
+    it = asks_list.emplace_back(order);
   }
   orders_[id] = OrderInfoByID{order, it};
+  uint64_t end_t = get_time_nanoseconds();
+  push_back_latencies.push_back(end_t - start_t);
   OnOrderAdded(order);
   return match_orders();
 }

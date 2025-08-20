@@ -13,6 +13,7 @@
 #include <atomic>
 #include <ctime>
 #include <chrono>
+#include <memory>
 
 
 class OrderBook {
@@ -32,6 +33,7 @@ public:
   OrderPointer get_order_by_id(OrderId );
   
   ~OrderBook();
+  std::vector<uint64_t> push_back_latencies;
 private:
   struct OrderInfoByID {
     OrderPointer pointer_; // points to the actual Order object
@@ -45,9 +47,11 @@ private:
     Match,
   };
 
+  std::shared_ptr<MemoryPool<ListNode<OrderPointer>>> pool;
+
   std::map<Price, OrderPointers, std::greater<Price>> bids_;
   std::map<Price, OrderPointers, std::less<Price>> asks_;
-  std::unordered_map<OrderId, OrderInfoByID> orders_;
+  std::unordered_map<OrderId, OrderInfoByID, std::hash<OrderId>> orders_;
   LevelsInfo levels;
   mutable std::mutex ordersMutex_;
   std::thread ordersPruneThread_;
@@ -70,4 +74,5 @@ private:
   void cancel_orders_internal(OrderIds);
   TradeInfos add_order_internal(OrderPointer order);
   TradeInfos match_orders();
+
 };

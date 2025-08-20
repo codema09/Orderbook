@@ -103,6 +103,11 @@ cout<<endl<<"Stats for initial BUY population:"<<endl;
 auto init_buy_stats = computeLatencyStats(init_buy_latencies);
 appendLatencyStatsToFile(init_buy_stats);
 
+cout<<endl;
+
+cout<<"Push back latencies: "<<endl;
+auto push_back_stats = computeLatencyStats(ob.push_back_latencies);
+appendLatencyStatsToFile(push_back_stats);
 
 
 {
