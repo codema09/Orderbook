@@ -35,7 +35,6 @@ class TradeInfos{
     void emplace_back(Ts&&... args){
         trades_made_.emplace_back(std::forward<Ts>(args)...);
     }
-    private:
     
         std::vector<TradeInfo> trades_made_;
     };

@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -flto=auto -pthread -Wl,--dependency-file=CMakeFiles/OrderBookApp.dir/link.d CMakeFiles/OrderBookApp.dir/src/OrderBookApp.cpp.o -o OrderBookApp  libOrderBookLib.a

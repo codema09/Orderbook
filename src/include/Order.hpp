@@ -5,13 +5,27 @@
 #include<memory>
 #include <list>
 #include <stdexcept>
+#include <atomic>
+#include <boost/intrusive_ptr.hpp>
+#include "CustomDLL.hpp"
+
+// Forward declare MemoryPool
+template <typename T>
+class MemoryPool;
 
 class Order{
 
     public:
-        Order(OrderType type_ip, OrderSide side, OrderId id, Price price, Quantity quantity):type_(type_ip),
-        side_(side),id_(id), price_(price), quantity_order_(quantity), quantity_order_left_(quantity)
-        {}
+        // Pool-aware constructor
+        Order(MemoryPool<Order>* pool_ptr,
+              OrderType type_ip, OrderSide side, OrderId id, Price price, Quantity quantity)
+        : type_(type_ip),
+          side_(side),id_(id), price_(price), quantity_order_(quantity), quantity_order_left_(quantity), pool_(pool_ptr) {}
+
+        // Legacy constructor (no pool)
+        Order(OrderType type_ip, OrderSide side, OrderId id, Price price, Quantity quantity)
+        : type_(type_ip),
+          side_(side),id_(id), price_(price), quantity_order_(quantity), quantity_order_left_(quantity), pool_(nullptr) {}
 
         bool is_filled(){
             return quantity_order_left_ == 0;
@@ -53,17 +67,38 @@ class Order{
 
          }
 
+         // Set pool pointer if constructed without one
+         void attach_pool(MemoryPool<Order>* pool_ptr){ pool_ = pool_ptr; }
+
+         // Intrusive pointer hooks
+         friend inline void intrusive_ptr_add_ref(Order* p) {
+             p->ref_count_.fetch_add(1, std::memory_order_relaxed);
+         }
+         friend inline void intrusive_ptr_release(Order* p) {
+             if (p->ref_count_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
+                 if (p->pool_ != nullptr) {
+                     // MemoryPool::deallocate will run the destructor
+                     p->pool_->deallocate(p);
+                 } else {
+                     // Fallback if not pool-backed
+                     delete p;
+                 }
+             }
+         }
+
     private:
 
     OrderType type_;
     OrderSide side_;
     OrderId id_;
-    Price price_;
+    mutable Price price_;
     Quantity quantity_order_;
     Quantity quantity_order_left_;
-
+    mutable std::atomic<uint32_t> ref_count_{0};
+    MemoryPool<Order>* pool_;
 };
 
 
-using OrderPointer = std::shared_ptr<Order> ;
-using OrderPointers = std::list<OrderPointer> ;
+using OrderPointer = boost::intrusive_ptr<Order> ;
+using OrderPointers = CustomLinkedList<OrderPointer> ;
+using OrderList = std::pmr::list<OrderPointer>;

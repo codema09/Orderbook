@@ -65,11 +65,13 @@ CMAKE_BINARY_DIR = /home/khr/homefr/CPP-Projects/Order-Book/build
 # The main recursive "all" target.
 all: CMakeFiles/OrderBookLib.dir/all
 all: CMakeFiles/OrderbookTest.dir/all
+all: CMakeFiles/OrderBookApp.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
 codegen: CMakeFiles/OrderBookLib.dir/codegen
 codegen: CMakeFiles/OrderbookTest.dir/codegen
+codegen: CMakeFiles/OrderBookApp.dir/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
@@ -79,6 +81,7 @@ preinstall:
 # The main recursive "clean" target.
 clean: CMakeFiles/OrderBookLib.dir/clean
 clean: CMakeFiles/OrderbookTest.dir/clean
+clean: CMakeFiles/OrderBookApp.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -88,7 +91,7 @@ clean: CMakeFiles/OrderbookTest.dir/clean
 CMakeFiles/OrderBookLib.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookLib.dir/build.make CMakeFiles/OrderBookLib.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookLib.dir/build.make CMakeFiles/OrderBookLib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=1,2 "Built target OrderBookLib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=3,4 "Built target OrderBookLib"
 .PHONY : CMakeFiles/OrderBookLib.dir/all
 
 # Build rule for subdir invocation for target.
@@ -105,7 +108,7 @@ OrderBookLib: CMakeFiles/OrderBookLib.dir/rule
 # codegen rule for target.
 CMakeFiles/OrderBookLib.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookLib.dir/build.make CMakeFiles/OrderBookLib.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=1,2 "Finished codegen for target OrderBookLib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=3,4 "Finished codegen for target OrderBookLib"
 .PHONY : CMakeFiles/OrderBookLib.dir/codegen
 
 # clean rule for target.
@@ -120,7 +123,7 @@ CMakeFiles/OrderBookLib.dir/clean:
 CMakeFiles/OrderbookTest.dir/all: CMakeFiles/OrderBookLib.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderbookTest.dir/build.make CMakeFiles/OrderbookTest.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderbookTest.dir/build.make CMakeFiles/OrderbookTest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=3,4,5 "Built target OrderbookTest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=5,6,7 "Built target OrderbookTest"
 .PHONY : CMakeFiles/OrderbookTest.dir/all
 
 # Build rule for subdir invocation for target.
@@ -137,13 +140,45 @@ OrderbookTest: CMakeFiles/OrderbookTest.dir/rule
 # codegen rule for target.
 CMakeFiles/OrderbookTest.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderbookTest.dir/build.make CMakeFiles/OrderbookTest.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=3,4,5 "Finished codegen for target OrderbookTest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=5,6,7 "Finished codegen for target OrderbookTest"
 .PHONY : CMakeFiles/OrderbookTest.dir/codegen
 
 # clean rule for target.
 CMakeFiles/OrderbookTest.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderbookTest.dir/build.make CMakeFiles/OrderbookTest.dir/clean
 .PHONY : CMakeFiles/OrderbookTest.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/OrderBookApp.dir
+
+# All Build rule for target.
+CMakeFiles/OrderBookApp.dir/all: CMakeFiles/OrderBookLib.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=1,2 "Built target OrderBookApp"
+.PHONY : CMakeFiles/OrderBookApp.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/OrderBookApp.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/OrderBookApp.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles 0
+.PHONY : CMakeFiles/OrderBookApp.dir/rule
+
+# Convenience name for target.
+OrderBookApp: CMakeFiles/OrderBookApp.dir/rule
+.PHONY : OrderBookApp
+
+# codegen rule for target.
+CMakeFiles/OrderBookApp.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/khr/homefr/CPP-Projects/Order-Book/build/CMakeFiles --progress-num=1,2 "Finished codegen for target OrderBookApp"
+.PHONY : CMakeFiles/OrderBookApp.dir/codegen
+
+# clean rule for target.
+CMakeFiles/OrderBookApp.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/clean
+.PHONY : CMakeFiles/OrderBookApp.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

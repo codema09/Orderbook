@@ -1,6 +1,9 @@
 #include "pch.h"
 
-#include "../src/OrderBook.cpp"
+#include "../src/include/OrderBook.hpp"
+#include "../src/include/PooledShared.hpp"
+#include "../src/include/MemoryPool.hpp"
+#include <charconv>
 
 namespace googletest = ::testing;
 
@@ -219,7 +222,9 @@ TEST_P(OrderbookTestsFixture, OrderbookTestSuite)
 
     auto GetOrder = [](const Information& action)
     {
-        return std::make_shared<Order>(
+        static MemoryPool<Order> order_pool; // local pool for test-created orders
+        return make_intrusive_pooled_order(
+            &order_pool,
             action.orderType_,
             action.side_,
             action.orderId_,
@@ -230,14 +235,14 @@ TEST_P(OrderbookTestsFixture, OrderbookTestSuite)
     OrderBook orderbook;
     auto GetOrderModify = [&orderbook](const Information& action)
     {
-        return OrderModify
-        {
-            orderbook.get_order_by_id(action.orderId_)->get_order_type(), //Currently testing with no modifciations to the type
+        static MemoryPool<Order> order_pool; // pool for modified orders
+        return OrderModify(
+            &order_pool,
+            orderbook.get_order_by_id(action.orderId_)->get_order_type(),
             action.side_,
             action.orderId_,
             action.price_,
-            action.quantity_,
-        };
+            action.quantity_);
     };
 
     // Act

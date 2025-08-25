@@ -13,7 +13,11 @@
 #include <atomic>
 #include <ctime>
 #include <chrono>
-
+#include <memory>
+#include <boost/unordered/unordered_flat_map.hpp>
+#include "CustomDLL.hpp"
+#include "tsl/robin_map.h"
+#include "absl/container/btree_map.h"
 
 class OrderBook {
 public:
@@ -45,16 +49,18 @@ private:
     Match,
   };
 
+  std::shared_ptr<MemoryPool<ListNode<OrderPointer>>> pool;
+
   std::map<Price, OrderPointers, std::greater<Price>> bids_;
   std::map<Price, OrderPointers, std::less<Price>> asks_;
-  std::unordered_map<OrderId, OrderInfoByID> orders_;
+  tsl::robin_map<OrderId, OrderInfoByID> orders_;
   LevelsInfo levels;
   mutable std::mutex ordersMutex_;
   std::thread ordersPruneThread_;
   std::condition_variable shutdownConditionVariable_;
   std::atomic<bool> shutdown_{ false };
   void PruneGoodForDayOrders();
-  void OnOrderCancelled(OrderPointer order);
+  void OnOrderCancelled(Price price, Quantity quantity, OrderSide side);
 
   void OnOrderAdded(OrderPointer order);
 
@@ -66,8 +72,9 @@ private:
   bool can_match();
   bool can_match_order(OrderSide side, Price price);
   bool can_fully_match_order(OrderSide side, Price price, Quantity quantity);
-  void cancel_order_internal(OrderId );
   void cancel_orders_internal(OrderIds);
+  void cancel_order_internal(OrderId, bool no_update_level = false);
   TradeInfos add_order_internal(OrderPointer order);
   TradeInfos match_orders();
+
 };

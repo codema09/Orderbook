@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = 
 
-CXX_FLAGS = -O3 -DNDEBUG -std=gnu++20
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++20 -std=gnu++20 -O3 -DNDEBUG -march=native -flto=auto -fno-omit-frame-pointer -pipe -pthread
 
