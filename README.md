@@ -114,7 +114,7 @@ OrderBook[1003]> C 1000                   # Cancel order 1000
 make performance
 ```
 
-Runs comprehensive latency benchmarks:
+Populates the OB with Millions of orders in steady state and Runs comprehensive latency benchmarks:
 - Order insertion performance
 - Matching engine latency
 - Memory allocation overhead
