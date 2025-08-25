@@ -87,8 +87,8 @@ for (int level = 0; level < 10000; ++level) {
         OrderPointer order = make_intrusive_pooled_order(&order_pool, OrderType::GoodTillCancel, OrderSide::Buy, id,price, quantity );
         auto trades = ob.add_order(order);
         uint64_t end_t = get_time_nanoseconds();
-        init_buy_latencies.push_back(end_t - start_t);
         populate_time_init += end_t- start_t;
+        init_buy_latencies.push_back(end_t - start_t);
     }
 
     
