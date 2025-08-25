@@ -119,7 +119,7 @@ Populates the OB with Millions of orders in steady state and Runs comprehensive 
 - Matching engine latency
 - Memory allocation overhead
 - Statistical analysis (median, 95th, 99th, 99.99th percentiles)
-- 
+- Main benchmarkig done from `src/PerfomarmanceTesting.cpp` script where we observe the behaviour of the OB when serving Millions of orders. This gives us a clear picture of a real world setting with warmer caches and lower latencies.
 ### Latency Statistics
 The performance test generates detailed statistics for time for action(in ns):
 ```
