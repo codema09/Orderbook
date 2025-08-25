@@ -123,12 +123,17 @@ Populates the OB with Millions of orders in steady state and Runs comprehensive 
 ### Latency Statistics
 The performance test generates detailed statistics for time for action(in ns):
 ```
-samples: 100000
-average: 1247.3
-median: 1156
-95th: 2341
-99th: 4567
-99.99th: 12453
+Stats for initial BUY population:
+samples: 1000000
+average:  115.802
+median:  120
+95th:    140
+96th:    140
+97th:    141
+98th:    150
+99th:    161
+99.99th: 4108
+
 ```
 
 ### Unit Testing
