@@ -119,6 +119,17 @@ Populates the OB with Millions of orders in steady state and Runs comprehensive 
 - Matching engine latency
 - Memory allocation overhead
 - Statistical analysis (median, 95th, 99th, 99.99th percentiles)
+- 
+### Latency Statistics
+The performance test generates detailed statistics for time for action(in ns):
+```
+samples: 100000
+average: 1247.3
+median: 1156
+95th: 2341
+99th: 4567
+99.99th: 12453
+```
 
 ### Unit Testing
 ```bash
@@ -147,17 +158,6 @@ The application provides real-time performance metrics:
 Trades executed (2):
 Trade: Buy Order #1000 matched with sell order #1001 at Price=100.50 and Quantity=500
 Core OrderBook time: 1,247 ns (1.25 μs)
-```
-
-### Latency Statistics
-The performance test generates detailed statistics:
-```
-samples: 100000
-average: 1247.3
-median: 1156
-95th: 2341
-99th: 4567
-99.99th: 12453
 ```
 
 ## Design Choices for Latency Optimization
@@ -243,10 +243,9 @@ TradeInfos OrderBook::match_orders() {
 
 #### Branch Prediction Optimization
 ```cpp
-if (bid_order.is_filled()) [[unlikely]] {
-    // Rarely taken branch
-    cancel_order_internal(buy_order_id, true);
-}
+  if (orders_.find(id) != orders_.end()) [[unlikely]] {
+    return {};
+  }
 ```
 
 #### SIMD-Friendly Operations
