@@ -152,9 +152,8 @@ TradeInfos OrderBook::modify_order(OrderModify modify_request) {
   return add_order_internal(modify_request.to_order_ptr());
 }
 
-void OrderBook::OnOrderCancelled(OrderPointer order) {
-  UpdateLevelData(order->get_price(), order->get_quantity(),
-                  order->get_order_side(), Action::Remove);
+void OrderBook::OnOrderCancelled(Price price, Quantity quantity, OrderSide side) {
+  UpdateLevelData(price, quantity, side, Action::Remove);
 }
 
 void OrderBook::OnOrderAdded(OrderPointer order) {
@@ -310,25 +309,32 @@ while (true) {
         trade_price, trade_quantity);
       
       bid_order.fill_order(trade_quantity);
-      OnOrderMatched(bids_pair.first, trade_quantity, OrderSide::Buy);
       if (bid_order.is_filled()) {
         // cancel_order_internal(buy_order_id, true);
         bids_list.erase(bid_it);
         if (bids_list.empty()) {
           bids_.erase(bids_pair.first);
         }
+        OnOrderCancelled(bids_pair.first, trade_quantity, OrderSide::Buy);
         orders_.erase(buy_order_id);
+      }
+      else{// this won't bring down the level count.
+        OnOrderMatched(bids_pair.first, trade_quantity, OrderSide::Buy);
+        
       }
       
       ask_order.fill_order(trade_quantity);
-      OnOrderMatched(asks_pair.first, trade_quantity, OrderSide::Sell);
       if (ask_order.is_filled()) {
         // cancel_order_internal(sell_order_id, true);
         asks_list.erase(ask_it);
         if (asks_list.empty()) {
           asks_.erase(asks_pair.first);
         }
+        OnOrderCancelled(asks_pair.first, trade_quantity, OrderSide::Sell);
         orders_.erase(sell_order_id);
+      }
+      else{// this won't bring down the level count.
+        OnOrderMatched(asks_pair.first, trade_quantity, OrderSide::Sell);
       }
 
   }
@@ -367,23 +373,24 @@ void OrderBook::cancel_order_internal(OrderId id, bool no_update_level) {
   auto &orderinfo = orders_[id];
   OrderPointers::iterator it = orderinfo.it_;
   auto &order = orderinfo.pointer_;
+  auto price = order->get_price();
+  auto quantity = order->get_quantity();
+  auto side = order->get_order_side();
 
-  if (order->get_order_side() == OrderSide::Buy) {
-    auto price = order->get_price();
+  if (side == OrderSide::Buy) {
     auto &bids_list = bids_[price];
     bids_list.erase(it);
     if (bids_list.empty()) {
       bids_.erase(price);
     }
-  } else if (order->get_order_side() == OrderSide::Sell) {
-    auto price = order->get_price();
+  } else if (side == OrderSide::Sell) {
     auto &asks_list = asks_[price];
     asks_list.erase(it);
     if (asks_list.empty()) {
       asks_.erase(price);
     }
   }
-  if(!no_update_level)OnOrderCancelled(order);
+  if(!no_update_level)OnOrderCancelled(price, quantity, side);
   orders_.erase(id);
 }
 

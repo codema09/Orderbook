@@ -17,6 +17,7 @@
 #include <boost/unordered/unordered_flat_map.hpp>
 #include "CustomDLL.hpp"
 #include "tsl/robin_map.h"
+#include "absl/container/btree_map.h"
 
 class OrderBook {
 public:
@@ -59,7 +60,7 @@ private:
   std::condition_variable shutdownConditionVariable_;
   std::atomic<bool> shutdown_{ false };
   void PruneGoodForDayOrders();
-  void OnOrderCancelled(OrderPointer order);
+  void OnOrderCancelled(Price price, Quantity quantity, OrderSide side);
 
   void OnOrderAdded(OrderPointer order);
 

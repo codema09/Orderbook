@@ -10,15 +10,15 @@ find_package(GTest REQUIRED)
 # Main library
 add_library(OrderBookLib
     src/OrderBook.cpp
-    src/OrderBook.hpp
-    src/LevelInfo.hpp
-    src/Order.hpp
-    src/constants.hpp
-    src/Usings.hpp
-    src/OrderType.hpp
-    src/TradeInfo.hpp
-    src/ModifyOrder.hpp
-    src/OrderSide.hpp
+    src/include/OrderBook.hpp
+    src/include/LevelInfo.hpp
+    src/include/Order.hpp
+    src/include/constants.hpp
+    src/include/Usings.hpp
+    src/include/OrderType.hpp
+    src/include/TradeInfo.hpp
+    src/include/ModifyOrder.hpp
+    src/include/OrderSide.hpp
 )
 
 # Test executable
