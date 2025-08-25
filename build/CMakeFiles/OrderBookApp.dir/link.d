@@ -1,12 +1,9 @@
-OrderbookTest: \
+OrderBookApp: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o \
-  CMakeFiles/OrderbookTest.dir/OrderbookTest/test.cpp.o \
-  CMakeFiles/OrderbookTest.dir/OrderbookTest/pch.cpp.o \
+  CMakeFiles/OrderBookApp.dir/src/OrderBookApp.cpp.o \
   libOrderBookLib.a \
-  /usr/lib/libgtest_main.so.1.17.0 \
-  /usr/lib/libgtest.so.1.17.0 \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libstdc++.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libm.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libm.so \
@@ -19,6 +16,7 @@ OrderbookTest: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libgcc_s.so.1 \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/libgcc.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/libgcc.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libpthread.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libc.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libc.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libc.so \
@@ -41,15 +39,9 @@ OrderbookTest: \
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o:
 
-CMakeFiles/OrderbookTest.dir/OrderbookTest/test.cpp.o:
-
-CMakeFiles/OrderbookTest.dir/OrderbookTest/pch.cpp.o:
+CMakeFiles/OrderBookApp.dir/src/OrderBookApp.cpp.o:
 
 libOrderBookLib.a:
-
-/usr/lib/libgtest_main.so.1.17.0:
-
-/usr/lib/libgtest.so.1.17.0:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libstdc++.so:
 
@@ -74,6 +66,8 @@ libOrderBookLib.a:
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/libgcc.a:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/libgcc.a:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libpthread.a:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/libc.so:
 

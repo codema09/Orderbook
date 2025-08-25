@@ -152,6 +152,19 @@ OrderbookTest/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderbookTest.dir/build.make CMakeFiles/OrderbookTest.dir/build
 .PHONY : OrderbookTest/fast
 
+#=============================================================================
+# Target rules for targets named OrderBookApp
+
+# Build rule for target.
+OrderBookApp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 OrderBookApp
+.PHONY : OrderBookApp
+
+# fast build rule for target.
+OrderBookApp/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/build
+.PHONY : OrderBookApp/fast
+
 OrderbookTest/pch.o: OrderbookTest/pch.cpp.o
 .PHONY : OrderbookTest/pch.o
 
@@ -224,6 +237,30 @@ src/OrderBook.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookLib.dir/build.make CMakeFiles/OrderBookLib.dir/src/OrderBook.cpp.s
 .PHONY : src/OrderBook.cpp.s
 
+src/OrderBookApp.o: src/OrderBookApp.cpp.o
+.PHONY : src/OrderBookApp.o
+
+# target to build an object file
+src/OrderBookApp.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/src/OrderBookApp.cpp.o
+.PHONY : src/OrderBookApp.cpp.o
+
+src/OrderBookApp.i: src/OrderBookApp.cpp.i
+.PHONY : src/OrderBookApp.i
+
+# target to preprocess a source file
+src/OrderBookApp.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/src/OrderBookApp.cpp.i
+.PHONY : src/OrderBookApp.cpp.i
+
+src/OrderBookApp.s: src/OrderBookApp.cpp.s
+.PHONY : src/OrderBookApp.s
+
+# target to generate assembly for a file
+src/OrderBookApp.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OrderBookApp.dir/build.make CMakeFiles/OrderBookApp.dir/src/OrderBookApp.cpp.s
+.PHONY : src/OrderBookApp.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -233,6 +270,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... OrderBookApp"
 	@echo "... OrderBookLib"
 	@echo "... OrderbookTest"
 	@echo "... OrderbookTest/pch.o"
@@ -244,6 +282,9 @@ help:
 	@echo "... src/OrderBook.o"
 	@echo "... src/OrderBook.i"
 	@echo "... src/OrderBook.s"
+	@echo "... src/OrderBookApp.o"
+	@echo "... src/OrderBookApp.i"
+	@echo "... src/OrderBookApp.s"
 .PHONY : help
 
 

@@ -1,5 +1,4 @@
 
-#pragma once
 #include "include/OrderBook.hpp"
 #include "include/Order.hpp"
 #include "include/OrderSide.hpp"
@@ -170,12 +169,12 @@ void OrderBook::UpdateLevelData(Price price, Quantity quantity, OrderSide side,
   auto &buy_side = levels.buy_levels_;
   auto &sell_side = levels.sell_levels_;
   //   auto &data_side = (side == OrderSide::Buy) ? *buy_side : *sell_side;
-  if (side == OrderSide::Buy and action!=Action::Add and buy_side.find(price) == buy_side.end()) {
-    return;
-  }
-  if (side == OrderSide::Sell and action!=Action::Add and sell_side.find(price) == sell_side.end()) {
-    return;
-  }
+  // if (side == OrderSide::Buy and action!=Action::Add and buy_side.find(price) == buy_side.end()) {
+  //   return;
+  // }
+  // if (side == OrderSide::Sell and action!=Action::Add and sell_side.find(price) == sell_side.end()) {
+  //   return;
+  // }
   auto &data = (side == OrderSide::Buy) ? buy_side[price] : sell_side[price];
 
   data.price_ = price;

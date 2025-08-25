@@ -37,6 +37,33 @@ target_link_libraries(OrderbookTest
 # Copy test files to build directory
 file(COPY OrderbookTest/TestFiles DESTINATION ${CMAKE_BINARY_DIR})
 
+# Main application executable
+add_executable(OrderBookApp
+    src/OrderBookApp.cpp
+)
+
+target_link_libraries(OrderBookApp
+    OrderBookLib
+)
+
+# Set specific compiler flags for OrderBookApp
+target_compile_options(OrderBookApp PRIVATE
+    -std=gnu++20
+    -O3
+    -DNDEBUG
+    -march=native
+    -flto=auto
+    -fno-omit-frame-pointer
+    -pipe
+    -pthread
+)
+
+# Set linker flags for OrderBookApp
+target_link_options(OrderBookApp PRIVATE
+    -flto=auto
+    -pthread
+)
+
 # Enable testing
 enable_testing()
 add_test(NAME OrderbookTests COMMAND OrderbookTest)
